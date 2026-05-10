@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNC Controller</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            text-align: center;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-top: 5%;
+        }
+
+        /* Command Buttons */
+        .btn {
+            padding: 20px;
+            width: 45%;
+            font-size: 18px;
+            color: white;
+            border-radius: 15px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 5px;
+        }
+
+        .btn-lock {
+            background-color: #ff4444;
+        }
+
+        .btn-mute {
+            background-color: #2196F3;
+        }
+
+        /* The App Manager List */
+        .app-container {
+            margin-top: 30px;
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .app-container h2 {
+            margin-top: 0;
+            color: #aaaaaa;
+            font-size: 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .app-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .app-name {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .btn-kill {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #status {
+            font-size: 18px;
+            margin-top: 20px;
+            color: #aaaaaa;
+        }
+    </style>
+</head>
+
+<body onload="fetchApps()">
+    <h1>SYNC Controller</h1>
+
+    <div style="display: flex; justify-content: space-between;">
+        <button class="btn btn-lock" onclick="sendCommand('/api/lock')">🔒 LOCK</button>
+        <button id="muteBtn" class="btn btn-mute" onclick="toggleMute()">🔇 MUTE</button>
+    </div>
+
+    <p id="status">Secure Connection Established</p>
+
+    <div class="app-container">
+        <h2>Running Apps</h2>
+        <div id="appList">
+            <p style="text-align:center; color:#888;">Loading apps...</p>
+        </div>
+    </div>
+
+    <script>
+        const SECRET_TOKEN = 'sync_remote_2026';
+        let isMuted = false;
+
+        // 1. Fetch running apps from the server
+        function fetchApps() {
+            fetch('/api/apps', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${SECRET_TOKEN}` }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const appListDiv = document.getElementById("appList");
+                    appListDiv.innerHTML = ""; // Clear the loading text
+
+                    if (data.apps.length === 0) {
+                        appListDiv.innerHTML = "<p style='text-align:center;'>No tracked apps running.</p>";
+                        return;
+                    }
+
+                    // Loop through the data and draw a row for every app
+                    data.apps.forEach(app => {
+                        appListDiv.innerHTML += `
+                        <div class="app-item">
+                            <span class="app-name">${app}</span>
+                            <button class="btn-kill" onclick="killApp('${app}')">CLOSE</button>
+                        </div>
+                    `;
+                    });
+                })
+                .catch(err => console.log(err));
+        }
+
+        // 2. Send the Kill Order
+        function killApp(appName) {
+            document.getElementById("status").innerText = `Closing ${appName}...`;
+
+            fetch('/api/kill', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${SECRET_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: appName }) // We send the name of the app to kill
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("status").innerText = data.message;
+                    // Refresh the list immediately after closing the app!
+                    setTimeout(fetchApps, 1000);
+                });
+        }
+
+        function sendCommand(apiRoute) {
+            fetch(apiRoute, { method: 'POST', headers: { 'Authorization': `Bearer ${SECRET_TOKEN}` } })
+                .then(r => r.json())
+                .then(data => { document.getElementById("status").innerText = data.message; });
+        }
+
+        function toggleMute() {
+            fetch('/api/mute', { method: 'POST', headers: { 'Authorization': `Bearer ${SECRET_TOKEN}` } })
+                .then(r => r.json())
+                .then(data => {
+                    isMuted = !isMuted;
+                    let btn = document.getElementById("muteBtn");
+                    if (isMuted) { btn.innerHTML = "🔊 UNMUTE"; btn.style.backgroundColor = "#ff9800"; }
+                    else { btn.innerHTML = "🔇 MUTE"; btn.style.backgroundColor = "#2196F3"; }
+                });
+        }
+    </script>
+</body>
+
+</html>

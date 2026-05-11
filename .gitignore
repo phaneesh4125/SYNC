@@ -1,0 +1,15 @@
+# Ignore the secret environment variables
+.env
+
+# Ignore the virtual environment
+.venv/
+venv/
+
+# Ignore Python cache and build files
+__pycache__/
+build/
+dist/
+*.spec
+
+# Ignore personal scripts
+start_tunnel.vbs

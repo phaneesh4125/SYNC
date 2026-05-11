@@ -17,33 +17,86 @@
         h1 {
             color: #4CAF50;
             margin-top: 5%;
+            margin-bottom: 20px;
         }
 
-        /* Command Buttons */
-        .btn {
+        /* Dashboard Cards */
+        .card {
+            background-color: #1e1e1e;
             padding: 20px;
-            width: 45%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .stat-box h2 {
+            margin: 10px 0 5px 0;
+            color: #2196F3;
+            font-size: 28px;
+        }
+
+        .stat-box small {
+            color: #aaaaaa;
+            font-weight: bold;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .status-text {
+            color: #888;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Controls */
+        .btn {
+            padding: 15px;
             font-size: 18px;
             color: white;
-            border-radius: 15px;
+            border-radius: 10px;
             border: none;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
-            margin: 5px;
+            width: 100%;
+            margin-bottom: 15px;
         }
 
         .btn-lock {
             background-color: #ff4444;
         }
 
-        .btn-mute {
-            background-color: #2196F3;
+        .btn-lock:hover {
+            background-color: #cc0000;
         }
 
-        /* The App Manager List */
+        /* Volume Slider */
+        .slider-container {
+            margin-top: 10px;
+        }
+
+        input[type=range] {
+            width: 100%;
+            margin: 15px 0;
+            accent-color: #2196F3;
+        }
+
+        /* App Manager */
         .app-container {
-            margin-top: 30px;
             background-color: #1e1e1e;
             border-radius: 15px;
             padding: 15px;
@@ -76,30 +129,82 @@
             background-color: #ff9800;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
+            padding: 8px 15px;
+            border-radius: 8px;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
         }
 
         #status {
-            font-size: 18px;
-            margin-top: 20px;
+            font-size: 16px;
+            margin-top: 15px;
             color: #aaaaaa;
+            text-align: center;
         }
     </style>
 </head>
 
-<body onload="fetchApps()">
-    <h1>SYNC Controller</h1>
-
-    <div style="display: flex; justify-content: space-between;">
-        <button class="btn btn-lock" onclick="sendCommand('/api/lock')">🔒 LOCK</button>
-        <button id="muteBtn" class="btn btn-mute" onclick="toggleMute()">🔇 MUTE</button>
+<body>
+    <div id="lock-screen"
+        style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #0f172a; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h1 style="color: white; margin-bottom: 20px; font-family: sans-serif; letter-spacing: 2px;">🔒 SYNC SECURE</h1>
+        <input type="password" id="pin-input" placeholder="Enter PIN"
+            style="padding: 15px; font-size: 24px; text-align: center; border-radius: 10px; border: none; outline: none; width: 200px; margin-bottom: 20px; background: #1e293b; color: white;">
+        <button onclick="attemptLogin()"
+            style="padding: 15px 40px; font-size: 18px; border-radius: 10px; border: none; background-color: #3b82f6; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);">UNLOCK</button>
+        <p id="lock-error" style="color: #ef4444; margin-top: 15px; display: none; font-weight: bold;">Incorrect PIN.
+            System Locked.</p>
     </div>
 
-    <p id="status">Secure Connection Established</p>
+    <h1>SYNC Controller</h1>
+
+    <div class="stat-grid">
+        <div class="stat-box">
+            <small>BATTERY</small>
+            <h2 id="bat-percent">--%</h2>
+            <span id="charge-status" class="status-text">Checking...</span>
+        </div>
+        <div class="stat-box">
+            <small>VOLUME</small>
+            <h2 id="vol-display">--%</h2>
+            <span class="status-text">Master</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <button class="btn btn-lock" onclick="sendCommand('/api/lock')">🔒 LOCK PC</button>
+        <div class="slider-container">
+            <small style="color: #aaaaaa; font-weight: bold;">ADJUST VOLUME</small>
+            <input type="range" id="vol-slider" min="0" max="100" onchange="updateVolume(this.value)">
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="color: #aaaaaa; margin-top: 0; font-size: 14px;">MEDIA PLAYBACK</h3>
+        <div style="display: flex; justify-content: space-between; gap: 10px;">
+            <button class="btn" style="background-color: #334155; margin-bottom: 0;"
+                onclick="sendMedia('prev')">⏮️</button>
+            <button class="btn" style="background-color: #eab308; margin-bottom: 0; color: #000;"
+                onclick="sendMedia('playpause')">⏯️</button>
+            <button class="btn" style="background-color: #334155; margin-bottom: 0;"
+                onclick="sendMedia('next')">⏭️</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="color: #aaaaaa; margin-top: 0; font-size: 14px; margin-bottom: 15px;">QUICK LAUNCH</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <button class="btn" style="background-color: #3b82f6; padding: 10px; font-size: 14px; margin: 0;"
+                onclick="launchApp('chrome')">🌐 Chrome</button>
+            <button class="btn" style="background-color: #1db954; padding: 10px; font-size: 14px; margin: 0;"
+                onclick="launchApp('spotify')">🎵 Spotify</button>
+            <button class="btn" style="background-color: #0ea5e9; padding: 10px; font-size: 14px; margin: 0;"
+                onclick="launchApp('edge')">🌊 Edge</button>
+            <button class="btn" style="background-color: #FF1B2D; padding: 10px; font-size: 14px; margin: 0;"
+                onclick="launchApp('opera')">⭕ Opera GX</button>
+        </div>
+    </div>
 
     <div class="app-container">
         <h2>Running Apps</h2>
@@ -108,74 +213,150 @@
         </div>
     </div>
 
+    <p id="status">Establishing Connection...</p>
+
     <script>
-        const SECRET_TOKEN = 'sync_remote_2026';
-        let isMuted = false;
+        // --- NEW SECURITY BOOT SEQUENCE ---
+        window.onload = function () {
+            // Check if we already have the VIP pass (Session Cookie)
+            fetch('/api/status').then(res => {
+                if (res.ok) {
+                    unlockUI(); // Already logged in!
+                } else {
+                    // Force lock screen to show
+                    document.getElementById('lock-screen').style.display = 'flex';
+                }
+            });
+        };
 
-        // 1. Fetch running apps from the server
-        function fetchApps() {
-            fetch('/api/apps', {
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${SECRET_TOKEN}` }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const appListDiv = document.getElementById("appList");
-                    appListDiv.innerHTML = ""; // Clear the loading text
-
-                    if (data.apps.length === 0) {
-                        appListDiv.innerHTML = "<p style='text-align:center;'>No tracked apps running.</p>";
-                        return;
-                    }
-
-                    // Loop through the data and draw a row for every app
-                    data.apps.forEach(app => {
-                        appListDiv.innerHTML += `
-                        <div class="app-item">
-                            <span class="app-name">${app}</span>
-                            <button class="btn-kill" onclick="killApp('${app}')">CLOSE</button>
-                        </div>
-                    `;
-                    });
-                })
-                .catch(err => console.log(err));
-        }
-
-        // 2. Send the Kill Order
-        function killApp(appName) {
-            document.getElementById("status").innerText = `Closing ${appName}...`;
-
-            fetch('/api/kill', {
+        function attemptLogin() {
+            const pin = document.getElementById('pin-input').value;
+            fetch('/api/login', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${SECRET_TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name: appName }) // We send the name of the app to kill
-            })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("status").innerText = data.message;
-                    // Refresh the list immediately after closing the app!
-                    setTimeout(fetchApps, 1000);
-                });
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin: pin })
+            }).then(res => {
+                if (res.ok) {
+                    unlockUI();
+                } else {
+                    document.getElementById('lock-error').style.display = 'block';
+                    document.getElementById('pin-input').value = '';
+                }
+            });
         }
 
-        function sendCommand(apiRoute) {
-            fetch(apiRoute, { method: 'POST', headers: { 'Authorization': `Bearer ${SECRET_TOKEN}` } })
-                .then(r => r.json())
-                .then(data => { document.getElementById("status").innerText = data.message; });
+        function unlockUI() {
+            document.getElementById('lock-screen').style.display = 'none';
+            fetchStats();
+            fetchApps();
+            // Start the auto-refresh engine ONLY after unlocking
+            setInterval(() => {
+                fetchStats();
+                fetchApps();
+            }, 5000);
         }
 
-        function toggleMute() {
-            fetch('/api/mute', { method: 'POST', headers: { 'Authorization': `Bearer ${SECRET_TOKEN}` } })
-                .then(r => r.json())
-                .then(data => {
-                    isMuted = !isMuted;
-                    let btn = document.getElementById("muteBtn");
-                    if (isMuted) { btn.innerHTML = "🔊 UNMUTE"; btn.style.backgroundColor = "#ff9800"; }
-                    else { btn.innerHTML = "🔇 MUTE"; btn.style.backgroundColor = "#2196F3"; }
+        // --- DASHBOARD LOGIC ---
+
+        // 1. Fetch Battery & Volume Stats
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+
+                document.getElementById('bat-percent').innerText = data.battery + "%";
+                document.getElementById('charge-status').innerText = data.charging ? "⚡ Charging" : "🔋 Unplugged";
+                document.getElementById('vol-display').innerText = data.volume + "%";
+
+                // Only update the slider position if the user isn't currently dragging it
+                if (document.activeElement !== document.getElementById('vol-slider')) {
+                    document.getElementById('vol-slider').value = data.volume;
+                }
+                document.getElementById('status').innerText = "Live tracking active";
+            } catch (err) {
+                console.log("Stats error:", err);
+            }
+        }
+
+        // 2. Change Volume
+        async function updateVolume(val) {
+            document.getElementById('vol-display').innerText = val + "%";
+            await fetch('/api/volume', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ level: val })
+            });
+            fetchStats();
+        }
+
+        // 3. Fetch Active Apps
+        async function fetchApps() {
+            try {
+                const response = await fetch('/api/apps');
+                const data = await response.json();
+                const appListDiv = document.getElementById("appList");
+
+                if (data.apps.length === 0) {
+                    appListDiv.innerHTML = "<p style='text-align:center; color:#888;'>No tracked apps running.</p>";
+                    return;
+                }
+
+                let newHTML = "";
+                data.apps.forEach(app => {
+                    newHTML += `
+                    <div class="app-item">
+                        <span class="app-name">${app}</span>
+                        <button class="btn-kill" onclick="killApp('${app}')">CLOSE</button>
+                    </div>`;
                 });
+                appListDiv.innerHTML = newHTML;
+            } catch (err) {
+                console.log("App fetch error:", err);
+            }
+        }
+
+        // 4. Force Close App
+        async function killApp(appName) {
+            document.getElementById("status").innerText = `Closing ${appName}...`;
+            await fetch('/api/kill', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: appName })
+            });
+            fetchApps();
+        }
+
+        // Launch App
+        async function launchApp(appId) {
+            document.getElementById("status").innerText = `Starting ${appId}...`;
+            const response = await fetch('/api/launch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: appId })
+            });
+            const data = await response.json();
+            document.getElementById("status").innerText = data.message;
+
+            setTimeout(fetchApps, 2000);
+        }
+
+        // Media Controls
+        async function sendMedia(action) {
+            document.getElementById("status").innerText = "Sending command...";
+            const response = await fetch('/api/media', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action })
+            });
+            const data = await response.json();
+            document.getElementById("status").innerText = data.message;
+        }
+
+        // 5. Hardware Commands (Lock)
+        async function sendCommand(apiRoute) {
+            const response = await fetch(apiRoute, { method: 'POST' });
+            const data = await response.json();
+            document.getElementById("status").innerText = data.message;
         }
     </script>
 </body>

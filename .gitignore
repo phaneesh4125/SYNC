@@ -13,3 +13,49 @@ dist/
 
 # Ignore personal scripts
 start_tunnel.vbs
+
+# === Sensitive Data ===
+# Never push your real credentials or domain
+.env
+# Keep your actual Ngrok config private
+ngrok.yml
+
+# === Python & Virtual Environments ===
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+
+# === PyInstaller & Build Artifacts ===
+# These are generated when you "crush" your code; others should generate their own
+build/
+dist/
+*.spec
+
+# === Executables & Binaries ===
+# Source code belongs in Git; executables belong in GitHub "Releases"
+*.exe
+*.msi
+*.bin
+
+# === Personal & Legacy Scripts ===
+start_tunnel.vbs
+test_*.py
+
+# === OS Specific Files ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Mobile (React Native / Expo) ===
+# If you keep the SYNC_Mobile folder in this same repo
+node_modules/
+.expo/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision

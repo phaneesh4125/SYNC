@@ -10,6 +10,7 @@ import subprocess
 # --- NEW: Direct Windows COM API Imports ---
 from comtypes import CLSCTX_ALL, CoInitialize, CoCreateInstance, GUID
 from pycaw.pycaw import IAudioEndpointVolume, IMMDeviceEnumerator
+from dotenv import load_dotenv
 load_dotenv()
 # --- PYINSTALLER MAGIC ---
 if getattr(sys, 'frozen', False):
@@ -144,12 +145,15 @@ def launch_app():
     data = request.json
     app_id = data.get('id')
     
+    # Fetch the hidden Windows AppData folder dynamically for Opera
+    local_app_data = os.environ.get('LOCALAPPDATA')
+    
     # Bulletproof Universal Launch Paths
     app_paths = {
         "chrome": "start chrome",
         "spotify": "start spotify",
         "edge": "start msedge",
-        "opera": "start opera"
+        "opera": f'"{local_app_data}\\Programs\\Opera GX\\launcher.exe"'
     }
     
     target_cmd = app_paths.get(app_id)

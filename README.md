@@ -2,7 +2,7 @@
 
 **A Full-Stack, Multi-Process Windows System Orchestrator**
 
-![SYNC Mobile Interface](./assets/mobile-ui-preview.jpeg)
+![SYNC Mobile Interface](./assets/mobile-ui-preview.jpg)
 
 SYNC Remote is a localized, high-performance system service that transforms a mobile device into a comprehensive command center for a Windows PC. Engineered with a Master/Worker architecture, the system runs silently in the Windows System Tray, dynamically managing network tunnels and production-grade local web servers to bridge mobile commands directly to the Windows OS kernel, audio drivers, and process manager.
 

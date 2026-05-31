@@ -1,4 +1,4 @@
-# 🎛️ SYNC Remote Workspace
+# SYNC Remote Workspace
 
 **A Full-Stack, Multi-Process Windows System Orchestrator**
 
@@ -8,7 +8,7 @@ SYNC Remote is a localized, high-performance system service that transforms a mo
 
 ---
 
-## ✨ Core Capabilities
+## Core Capabilities
 
 * **Live Process Management:** Real-time fetching of active Windows tasks with the ability to remotely terminate (`taskkill`) applications.
 * **Hardware & OS Interfacing:** Zero-latency control over the Windows Core Audio API (Volume) and native OS commands (Lock Workstation).
@@ -20,7 +20,7 @@ SYNC Remote is a localized, high-performance system service that transforms a mo
 
 ---
 
-## 🏗️ System Architecture & Tech Stack
+## System Architecture & Tech Stack
 
 ### The Tech Stack
 * **Mobile Frontend:** React Native / Expo (Custom Neumorphic UI, State Management)
@@ -37,7 +37,7 @@ SYNC Remote is a localized, high-performance system service that transforms a mo
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### For End-Users (No Code Required)
 1. Navigate to the [Releases](../../releases) tab on this repository.

@@ -2,7 +2,6 @@
 
 **A Full-Stack, Multi-Process Windows System Orchestrator**
 
-![SYNC Mobile Interface](./SYNC_Remote_Server/assets/mobile-ui-preview.jpg)
 
 SYNC Remote is a localized, high-performance system service that transforms a mobile device into a comprehensive command center for a Windows PC. Engineered with a Master/Worker architecture, the system runs silently in the Windows System Tray, dynamically managing network tunnels and production-grade local web servers to bridge mobile commands directly to the Windows OS kernel, audio drivers, and process manager.
 
@@ -45,6 +44,8 @@ SYNC Remote is a localized, high-performance system service that transforms a mo
 3. Rename `.env.example` to `.env` and insert your static Ngrok domain.
 4. Double-click `SYNC_App.exe`. 
 *(Optional: Create a shortcut of `SYNC_App.exe` and place it in your `shell:startup` folder for automatic boot).*
+
+![SYNC Mobile Interface](./SYNC_Remote_Server/assets/mobile-ui-preview.jpg)
 
 ### For Developers (Local Setup)
 To run the source code and modify the engine:
